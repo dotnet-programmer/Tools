@@ -1,0 +1,152 @@
+﻿<Window x:Class="CalculateChecksum.MainWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:CalculateChecksum"
+		mc:Ignorable="d"
+		Title="Suma kontrolna"
+		Height="300"
+		Width="1150"
+		WindowStartupLocation="CenterScreen">
+
+	<Window.Resources>
+		<Style TargetType="{x:Type Label}">
+			<Setter Property="HorizontalContentAlignment"
+					Value="Right" />
+			<Setter Property="VerticalContentAlignment"
+					Value="Center" />
+		</Style>
+		<Style TargetType="{x:Type TextBox}">
+			<Setter Property="Margin"
+					Value="5" />
+			<Setter Property="IsEnabled"
+					Value="False" />
+			<Setter Property="VerticalContentAlignment"
+					Value="Center" />
+		</Style>
+		<Style TargetType="{x:Type Image}">
+			<Setter Property="Margin"
+					Value="7" />
+		</Style>
+	</Window.Resources>
+
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="145" />
+			<ColumnDefinition Width="70" />
+			<ColumnDefinition />
+			<ColumnDefinition Width="40" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition />
+			<RowDefinition />
+			<RowDefinition />
+			<RowDefinition />
+			<RowDefinition />
+			<RowDefinition />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+
+		<CheckBox x:Name="ChContextMenu"
+				  Grid.Row="0"
+				  Grid.Column="0"
+				  Content="Menu kontekstowe"
+				  Click="ChContextMenu_Click"
+				  Margin="10"
+				  VerticalContentAlignment="Center" />
+
+		<Button x:Name="BtnChooseFile"
+				Click="BtnChooseFile_Click"
+				Grid.Row="1"
+				Grid.Column="0"
+				Grid.RowSpan="4"
+				AllowDrop="True"
+				Drop="BtnChooseFile_Drop"
+				DragEnter="BtnChooseFile_DragEnter"
+				Margin="10">
+			<TextBlock Text="Wybierz plik lub przeciągnij tutaj"
+					   TextWrapping="Wrap"
+					   TextAlignment="Center" />
+		</Button>
+
+		<Label x:Name="LbTime"
+			   Content="ms: "
+			   Grid.Row="5"
+			   Grid.Column="0"
+			   HorizontalContentAlignment="Left" />
+
+		<Label Content="Suma pliku:"
+			   Grid.Row="0"
+			   Grid.Column="1" />
+		<TextBox x:Name="TxtValueToCheck"
+				 Grid.Row="0"
+				 Grid.Column="2"
+				 IsEnabled="True"
+				 TextChanged="TxtValueToCheck_TextChanged" />
+
+		<Label Content="MD5:"
+			   Grid.Row="1"
+			   Grid.Column="1" />
+		<TextBox x:Name="TxtMd5"
+				 Grid.Row="1"
+				 Grid.Column="2"
+				 TextChanged="TxtValueToCheck_TextChanged" />
+		<Image x:Name="ImgMd5"
+			   Grid.Row="1"
+			   Grid.Column="4" />
+
+		<Label Content="SHA1:"
+			   Grid.Row="2"
+			   Grid.Column="1" />
+		<TextBox x:Name="TxtSha1"
+				 Grid.Row="2"
+				 Grid.Column="2"
+				 TextChanged="TxtValueToCheck_TextChanged" />
+		<Image x:Name="ImgSha1"
+			   Grid.Row="2"
+			   Grid.Column="4" />
+
+		<Label Content="SHA256:"
+			   Grid.Row="3"
+			   Grid.Column="1" />
+		<TextBox x:Name="TxtSha256"
+				 Grid.Row="3"
+				 Grid.Column="2"
+				 TextChanged="TxtValueToCheck_TextChanged" />
+		<Image x:Name="ImgSha256"
+			   Grid.Row="3"
+			   Grid.Column="4" />
+
+		<Label Content="SHA384:"
+			   Grid.Row="4"
+			   Grid.Column="1" />
+		<TextBox x:Name="TxtSha384"
+				 Grid.Row="4"
+				 Grid.Column="2"
+				 TextChanged="TxtValueToCheck_TextChanged" />
+		<Image x:Name="ImgSha384"
+			   Grid.Row="4"
+			   Grid.Column="4" />
+
+		<Label Content="SHA512:"
+			   Grid.Row="5"
+			   Grid.Column="1" />
+		<TextBox x:Name="TxtSha512"
+				 Grid.Row="5"
+				 Grid.Column="2"
+				 TextChanged="TxtValueToCheck_TextChanged" />
+		<Image x:Name="ImgSha512"
+			   Grid.Row="5"
+			   Grid.Column="4" />
+
+		<ProgressBar x:Name="Progress"
+					 Grid.Row="6"
+					 Grid.Column="0"
+					 Grid.ColumnSpan="4"
+					 Height="20"
+					 VerticalAlignment="Bottom"
+					 Minimum="0"
+					 Maximum="100" />
+	</Grid>
+</Window>
