@@ -90,6 +90,7 @@ public partial class MainWindow : Window
 	private void CalculateCheckSum(string filename)
 	{
 		TxtMd5.Text = TxtSha1.Text = TxtSha256.Text = TxtSha384.Text = TxtSha512.Text = string.Empty;
+		Progress.Value = 0;
 		Stopwatch watch = Stopwatch.StartNew();
 
 		Task<string> task5 = Task.Run(() => CheckSum.CalculateSHA512(filename));
