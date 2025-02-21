@@ -11,7 +11,7 @@ namespace ImageBrowser;
 public partial class MainWindow : Window
 {
 	private readonly Random _random = new();
-	private readonly string[] _files = Directory.GetFiles(Environment.CurrentDirectory, "*", SearchOption.AllDirectories);
+	private readonly List<string> _files = [];
 
 	private int _imgNumber;
 
@@ -23,9 +23,9 @@ public partial class MainWindow : Window
 	public MainWindow()
 	{
 		InitializeComponent();
+		GetFiles();
+		_files = _files.OrderBy(x => x).ToList();
 		NewImage(ActionType.random);
-		//_files.OrderBy(x => x);
-		_files = _files.OrderBy(x => x).ToArray();
 	}
 
 	private void BtnPrevious_Click(object sender, RoutedEventArgs e)
@@ -65,8 +65,25 @@ public partial class MainWindow : Window
 		NewImage(actionType);
 	}
 
+	private void GetFiles()
+	{
+		var files = Directory.GetFiles(Environment.CurrentDirectory, "*", SearchOption.AllDirectories);
+		foreach (var file in files)
+		{
+			if (file.EndsWith(".jpg") || file.EndsWith(".jpeg") || file.EndsWith(".png") || file.EndsWith(".gif"))
+			{
+				_files.Add(file);
+			}
+		}
+	}
+
 	private void NewImage(ActionType actionType)
 	{
+		if (_files.Count == 0)
+		{
+			return;
+		}
+
 		BitmapImage image = new();
 		image.BeginInit();
 
@@ -76,23 +93,22 @@ public partial class MainWindow : Window
 				_imgNumber--;
 				if (_imgNumber < 0)
 				{
-					_imgNumber = _files.Length - 1;
+					_imgNumber = _files.Count - 1;
 				}
-				image.UriSource = new Uri(_files[_imgNumber]);
 				break;
 			case ActionType.random:
-				_imgNumber = _random.Next(_files.Length);
-				image.UriSource = new Uri(_files[_imgNumber]);
+				_imgNumber = _random.Next(_files.Count);
 				break;
 			case ActionType.next:
 				_imgNumber++;
-				if (_imgNumber >= _files.Length)
+				if (_imgNumber >= _files.Count)
 				{
 					_imgNumber = 0;
 				}
-				image.UriSource = new Uri(_files[_imgNumber]);
 				break;
 		}
+
+		image.UriSource = new Uri(_files[_imgNumber]);
 
 		image.EndInit();
 		ImgViewer.Source = image;
