@@ -7,16 +7,16 @@ internal class WeatherApi
 	//private const string _apiAddressId = "https://api.openweathermap.org/data/2.5/weather?id=";
 	private const string _apiAddressCity = "https://api.openweathermap.org/data/2.5/weather?q=";
 
-	private const string _apiKey = "&appid=f85b83051e492adccf5a57e6062e62ff";
+	private const string _apiKey = "&appid=";
 	private const string _parameters = "&units=metric&lang=pl";
 
-	public static List<WeatherJson> GetWeather(params string[] cities)
+	public static async Task<List<WeatherJson>> GetWeather(params string[] cities)
 	{
 		List<WeatherJson> result = new(cities.Length);
 
 		foreach (var item in cities)
 		{
-			var weather = JsonSerializer.Deserialize<WeatherJson>(GetWeatherJson($"{_apiAddressCity}{item}{_apiKey}{_parameters}").Result);
+			var weather = JsonSerializer.Deserialize<WeatherJson>(await GetWeatherJsonAsync($"{_apiAddressCity}{item}{_apiKey}{_parameters}"));
 
 			if (weather.cod != 200)
 			{
@@ -30,7 +30,7 @@ internal class WeatherApi
 		return result;
 	}
 
-	private static async Task<string> GetWeatherJson(string url)
+	private static async Task<string> GetWeatherJsonAsync(string url)
 	{
 		string json = string.Empty;
 		try

@@ -3,7 +3,7 @@
 const string _filename = "../../../items.xml";
 
 // Load the reader with the data file
-using (XmlTextReader reader = new XmlTextReader(_filename))
+using (XmlTextReader reader = new(_filename))
 {
 	// ignore all white space nodes.
 	reader.WhitespaceHandling = WhitespaceHandling.None;

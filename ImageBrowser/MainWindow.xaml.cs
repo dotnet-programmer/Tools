@@ -24,7 +24,6 @@ public partial class MainWindow : Window
 	{
 		InitializeComponent();
 		GetFiles();
-		_files = _files.OrderBy(x => x).ToList();
 		NewImage(ActionType.random);
 	}
 
@@ -51,7 +50,7 @@ public partial class MainWindow : Window
 				NewImage(ActionType.next);
 				break;
 			case Key.Escape:
-				Close();
+				Application.Current.Shutdown();
 				break;
 		}
 	}
@@ -60,10 +59,7 @@ public partial class MainWindow : Window
 		=> NewImage(ActionType.random);
 
 	private void Window_MouseWheel(object sender, MouseWheelEventArgs e)
-	{
-		ActionType actionType = e.Delta > 0 ? ActionType.previous : ActionType.next;
-		NewImage(actionType);
-	}
+		=> NewImage(e.Delta > 0 ? ActionType.previous : ActionType.next);
 
 	private void GetFiles()
 	{
@@ -75,6 +71,7 @@ public partial class MainWindow : Window
 				_files.Add(file);
 			}
 		}
+		_files.Sort();
 	}
 
 	private void NewImage(ActionType actionType)
@@ -109,7 +106,6 @@ public partial class MainWindow : Window
 		}
 
 		image.UriSource = new Uri(_files[_imgNumber]);
-
 		image.EndInit();
 		ImgViewer.Source = image;
 		Title = image.UriSource.ToString();

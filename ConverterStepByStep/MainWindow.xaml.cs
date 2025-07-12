@@ -52,7 +52,6 @@ public partial class MainWindow : Window
 			result = remainder.ToString() + result;
 			number /= 2;
 			TxtBinSteps.Text += $"{number} reszta {remainder}\n";
-
 			counter++;
 			if (counter % 4 == 0)
 			{

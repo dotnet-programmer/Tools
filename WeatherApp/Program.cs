@@ -3,7 +3,7 @@
 ConsoleColor defaultColor = Console.ForegroundColor;
 int defaultHeight = Console.WindowHeight;
 
-var weatherList = WeatherApi.GetWeather("Gdańsk", "Kielce");
+var weatherList = await WeatherApi.GetWeather("Gdańsk", "Kielce");
 
 Console.WindowHeight = defaultHeight + 10;
 

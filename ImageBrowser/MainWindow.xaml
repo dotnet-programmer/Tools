@@ -8,50 +8,59 @@
 		Title="Image Browser"
 		Height="450"
 		Width="800"
+		MinHeight="100"
+		MinWidth="100"
 		Background="#FF444444"
 		WindowStartupLocation="CenterScreen"
-		WindowState="Maximized"
 		KeyDown="Window_KeyDown"
 		MouseWheel="Window_MouseWheel">
+
+	<Window.Resources>
+		<Style TargetType="{x:Type Button}">
+			<Setter Property="Height"
+				Value="30" />
+			<Setter Property="Margin"
+				Value="2" />
+			<Setter Property="Focusable"
+				Value="False" />
+			<Setter Property="Background"
+				Value="#FF7C7C7C" />
+		</Style>
+	</Window.Resources>
+
 	<Grid>
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="9*" />
-			<ColumnDefinition Width="91*" />
+			<ColumnDefinition />
+			<ColumnDefinition />
+			<ColumnDefinition />
 		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+
 		<Image x:Name="ImgViewer"
-			   Margin="10,10,10,45"
-			   MouseLeftButtonDown="ImgViewer_MouseLeftButtonDown"
-			   Grid.ColumnSpan="2" />
+			   Grid.Row="0"
+			   Grid.Column="0"
+			   Grid.ColumnSpan="3" 
+			   MouseLeftButtonDown="ImgViewer_MouseLeftButtonDown" />
+
 		<Button x:Name="BtnPrevious"
+				Grid.Row="1"
+				Grid.Column="0"
 				Content="&lt;&lt;"
-				Margin="10,0,0,10"
-				Height="30"
-				VerticalAlignment="Bottom"
-				HorizontalAlignment="Left"
-				Width="300"
-				Background="#FF7C7C7C"
-				Click="BtnPrevious_Click"
-				Focusable="False"
-				Grid.ColumnSpan="2" />
+				Click="BtnPrevious_Click" />
+
 		<Button x:Name="BtnRandom"
+				Grid.Row="1"
+				Grid.Column="1"
 				Content="Losuj"
-				Margin="243,0,315,10"
-				Height="30"
-				VerticalAlignment="Bottom"
-				Background="#FF7C7C7C"
-				Click="BtnRandom_Click"
-				Focusable="False"
-				Grid.Column="1" />
+				Click="BtnRandom_Click" />
+
 		<Button x:Name="BtnNext"
+				Grid.Row="1"
+				Grid.Column="2"
 				Content="&gt;&gt;"
-				Margin="0,0,10,10"
-				Height="30"
-				VerticalAlignment="Bottom"
-				HorizontalAlignment="Right"
-				Width="300"
-				Background="#FF7C7C7C"
-				Click="BtnNext_Click"
-				Focusable="False"
-				Grid.Column="1" />
+				Click="BtnNext_Click" />
 	</Grid>
 </Window>

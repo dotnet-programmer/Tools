@@ -13,8 +13,8 @@ namespace CalculateChecksum;
 /// </summary>
 public partial class MainWindow : Window
 {
-	private const string _mainTitle = "Suma kontrolna";
-	private const string _subKey = @"SOFTWARE\Classes\*\shell\CheckMD5Hash";
+	private const string MainTitle = "Suma kontrolna";
+	private const string SubKey = @"SOFTWARE\Classes\*\shell\CheckMD5Hash";
 
 	private readonly RegistryKey _myRoot = Registry.CurrentUser;
 
@@ -48,7 +48,7 @@ public partial class MainWindow : Window
 	{
 		if (ChContextMenu.IsChecked.GetValueOrDefault())
 		{
-			RegistryKey myKey = _myRoot.CreateSubKey(_subKey, true);
+			RegistryKey myKey = _myRoot.CreateSubKey(SubKey, true);
 			myKey.SetValue("", "Suma kontrolna");
 			var appLocation = Application.ResourceAssembly.Location.Replace('/', '\\');
 			appLocation = appLocation.EndsWith(".dll") ? appLocation.Replace(".dll", ".exe") : appLocation;
@@ -57,7 +57,7 @@ public partial class MainWindow : Window
 		}
 		else
 		{
-			_myRoot.DeleteSubKeyTree(_subKey);
+			_myRoot.DeleteSubKeyTree(SubKey);
 		}
 	}
 
@@ -71,8 +71,26 @@ public partial class MainWindow : Window
 		}
 	}
 
+	private void TxtValueToCheck_TextChanged(object sender, TextChangedEventArgs e)
+	{
+		string valueToCheck = TxtValueToCheck.Text;
+
+		SetPicture(valueToCheck, TxtMd5, ImgMd5);
+		SetPicture(valueToCheck, TxtSha1, ImgSha1);
+		SetPicture(valueToCheck, TxtSha256, ImgSha256);
+		SetPicture(valueToCheck, TxtSha384, ImgSha384);
+		SetPicture(valueToCheck, TxtSha512, ImgSha512);
+
+		static void SetPicture(string valueToCheck, TextBox textBox, Image image)
+		{
+			string imageName = textBox.Text.Equals(valueToCheck, StringComparison.CurrentCultureIgnoreCase) ? "imgYes.png" : "imgNo.png";
+			var uriSource = new Uri(@$"/CalculateChecksum;component/Images/{imageName}", UriKind.Relative);
+			image.Source = new BitmapImage(uriSource);
+		}
+	}
+
 	private void SetComponentsOnForm()
-		=> ChContextMenu.IsChecked = _myRoot.OpenSubKey(_subKey) != null;
+		=> ChContextMenu.IsChecked = _myRoot.OpenSubKey(SubKey) != null;
 
 	private void CheckStartArguments()
 	{
@@ -85,7 +103,7 @@ public partial class MainWindow : Window
 	}
 
 	private void SetMainTitle(string filename)
-		=> Title = $"{_mainTitle} - {filename}";
+		=> Title = $"{MainTitle} - {filename}";
 
 	private void CalculateCheckSum(string filename)
 	{
@@ -107,24 +125,6 @@ public partial class MainWindow : Window
 
 		watch.Stop();
 		LbTime.Content = $"ms: {watch.ElapsedMilliseconds}";
-	}
-
-	private void TxtValueToCheck_TextChanged(object sender, TextChangedEventArgs e)
-	{
-		string valueToCheck = TxtValueToCheck.Text;
-
-		SetPicture(valueToCheck, TxtMd5, ImgMd5);
-		SetPicture(valueToCheck, TxtSha1, ImgSha1);
-		SetPicture(valueToCheck, TxtSha256, ImgSha256);
-		SetPicture(valueToCheck, TxtSha384, ImgSha384);
-		SetPicture(valueToCheck, TxtSha512, ImgSha512);
-
-		static void SetPicture(string valueToCheck, TextBox textBox, Image image)
-		{
-			string imageName = textBox.Text.Equals(valueToCheck, StringComparison.CurrentCultureIgnoreCase) ? "imgYes.png" : "imgNo.png";
-			var uriSource = new Uri(@$"/CalculateChecksum;component/Images/{imageName}", UriKind.Relative);
-			image.Source = new BitmapImage(uriSource);
-		}
 	}
 
 	private void UpdateTextBox(TextBox textBox, string result)
