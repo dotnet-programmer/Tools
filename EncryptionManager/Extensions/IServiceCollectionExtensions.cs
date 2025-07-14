@@ -3,9 +3,11 @@ using System.Reflection;
 using System.Windows;
 using EncryptionManager.DataLayer;
 using EncryptionManager.Interfaces;
+using EncryptionManager.Models;
 using EncryptionManager.Services;
 using EncryptionManager.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
@@ -14,7 +16,7 @@ namespace EncryptionManager.Extensions;
 
 internal static class IServiceCollectionExtensions
 {
-	public static void ConfigureServices(this IServiceCollection services)
+	public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
 	{
 		// Configure Logging
 		services.AddLogging(loggingBuilder =>
@@ -24,11 +26,18 @@ internal static class IServiceCollectionExtensions
 			loggingBuilder.AddNLog("nlog.config");
 		});
 
+		// Encryption
+		// once run it will generate keys, just run once in debugger, copy keys and remove call
+		// var keyInfo = new KeyInfo();
+		// keys can also be read from the configuration file
+		EncryptionService encryptionService = new(new KeyInfo("kk3zd3HAIZjiZnDUhuU9OMASs4eljyPBZ1WbFdgC3UE=", "4ITbLvvo3BWGObJRFH4wDg=="));
+		services.AddSingleton<IEncryptionService>(encryptionService);
+
 		// Configure Entity Framework Core and DbContext
 		services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 		var connectionString = "connection string"; // TODO: read from configuration and decrypt encrypted string
-		services.AddDbContext<ApplicationDbContext>(options => 
-			options.UseSqlServer(connectionString));
+		//var connectionString = encryptionService.Decrypt(configuration.GetConnectionString("DefaultConnection"));
+		services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
 		// Register ViewModels
 		services.AddSingleton<IMainViewModel, MainViewModel>();
