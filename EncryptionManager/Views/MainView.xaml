@@ -4,10 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EncryptionManager"
+		xmlns:vm="clr-namespace:EncryptionManager.Interfaces"
+		d:DataContext="{d:DesignInstance Type=vm:IMainViewModel}"
         mc:Ignorable="d"
         Title="Encryption Manager" 
 		Height="450" 
-		Width="800">
+		Width="800"
+		WindowStartupLocation="CenterScreen">
     <Grid>
 
     </Grid>

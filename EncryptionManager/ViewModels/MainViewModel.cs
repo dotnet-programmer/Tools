@@ -1,5 +1,8 @@
-﻿namespace EncryptionManager.ViewModels;
+﻿using EncryptionManager.Interfaces;
 
-internal class MainViewModel : BaseViewModel
+namespace EncryptionManager.ViewModels;
+
+internal class MainViewModel : BaseViewModel, IMainViewModel
 {
+
 }

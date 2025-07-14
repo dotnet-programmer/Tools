@@ -1,13 +1,13 @@
 ﻿using System.Windows;
-using EncryptionManager.ViewModels;
+using EncryptionManager.Interfaces;
 
 namespace EncryptionManager.Views;
 
 public partial class MainView : Window
 {
-	public MainView()
+	public MainView(IMainViewModel mainViewModel)
 	{
 		InitializeComponent();
-		DataContext = new MainViewModel();
+		DataContext = mainViewModel;
 	}
 }
