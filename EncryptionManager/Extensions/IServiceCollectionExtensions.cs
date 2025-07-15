@@ -1,13 +1,12 @@
-﻿using System.Configuration;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Windows;
 using EncryptionManager.DataLayer;
+using EncryptionManager.DataLayer.Repositories;
 using EncryptionManager.Interfaces;
 using EncryptionManager.Models;
 using EncryptionManager.Services;
 using EncryptionManager.ViewModels;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
@@ -37,8 +36,11 @@ internal static class IServiceCollectionExtensions
 		// Configure Entity Framework Core and DbContext
 		services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 		var connectionString = "connection string"; // TODO: read from configuration and decrypt encrypted string
-		//var connectionString = encryptionService.Decrypt(configuration.GetConnectionString("DefaultConnection"));
+													//var connectionString = encryptionService.Decrypt(configuration.GetConnectionString("DefaultConnection"));
 		services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+
+		services.AddScoped<IUnitOfWork, UnitOfWork>();
+		services.AddScoped<IDbRepository, DbRepository>();
 
 		// Register ViewModels
 		services.AddTransient<IMainViewModel, MainViewModel>();

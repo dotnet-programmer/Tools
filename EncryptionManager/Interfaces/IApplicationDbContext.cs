@@ -2,5 +2,5 @@
 
 internal interface IApplicationDbContext : IDisposable
 {
-
+	int SaveChanges();
 }
