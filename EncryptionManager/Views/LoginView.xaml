@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EncryptionManager.Views"
+		xmlns:converters="clr-namespace:EncryptionManager.Views.Converters"
 		xmlns:vm="clr-namespace:EncryptionManager.Interfaces"
 		d:DataContext="{d:DesignInstance Type=vm:ILoginViewModel}"
         mc:Ignorable="d"
@@ -71,7 +72,7 @@
 			<TextBlock.Style>
 				<Style TargetType="{x:Type TextBlock}">
 					<Setter Property="Foreground"
-							Value="{Binding Status.IsValidConnection}" />
+							Value="{Binding Status.IsValidConnection, Converter={converters:BoolToColorConverter}}" />
 				</Style>
 			</TextBlock.Style>
 		</TextBlock>
