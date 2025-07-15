@@ -16,7 +16,8 @@ namespace EncryptionManager.Extensions;
 
 internal static class IServiceCollectionExtensions
 {
-	public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
+	public static void ConfigureServices(this IServiceCollection services)
+	//public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
 	{
 		// Configure Logging
 		services.AddLogging(loggingBuilder =>
@@ -40,7 +41,8 @@ internal static class IServiceCollectionExtensions
 		services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
 		// Register ViewModels
-		services.AddSingleton<IMainViewModel, MainViewModel>();
+		services.AddTransient<IMainViewModel, MainViewModel>();
+		services.AddTransient<ILoginViewModel, LoginViewModel>();
 
 		// Register DialogService
 		services.AddSingleton<IDialogService, DialogService>();

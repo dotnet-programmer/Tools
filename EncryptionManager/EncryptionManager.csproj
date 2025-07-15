@@ -9,10 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DataLayer\Configurations\" />
-    <Folder Include="DataLayer\Extensions\" />
+    <None Remove="Images\Cancel_1.png" />
+    <None Remove="Images\Cancel_2.png" />
+    <None Remove="Images\Confirm.png" />
+    <None Remove="Images\Refresh.png" />
+    <None Remove="Images\Setting.png" />
+    <None Remove="Images\SettingsIco.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="DataLayer\Migrations\" />
-    <Folder Include="Domain\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +37,15 @@
     <PackageReference Include="NLog" Version="6.0.1" />
     <PackageReference Include="NLog.Extensions.Logging" Version="6.0.1" />
     <PackageReference Include="NLog.Schema" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\Cancel_1.png" />
+    <Resource Include="Images\Cancel_2.png" />
+    <Resource Include="Images\Confirm.png" />
+    <Resource Include="Images\Refresh.png" />
+    <Resource Include="Images\Setting.png" />
+    <Resource Include="Images\SettingsIco.png" />
   </ItemGroup>
 
   <ItemGroup>
