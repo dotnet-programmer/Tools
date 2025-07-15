@@ -45,6 +45,7 @@ internal static class IServiceCollectionExtensions
 		// Register ViewModels
 		services.AddTransient<IMainViewModel, MainViewModel>();
 		services.AddTransient<ILoginViewModel, LoginViewModel>();
+		services.AddTransient<ISettingsViewModel, SettingsViewModel>();
 
 		// Register DialogService
 		services.AddSingleton<IDialogService, DialogService>();
