@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EncryptionManager.Views"
 		xmlns:converters="clr-namespace:EncryptionManager.Views.Converters"
+		xmlns:helpers="clr-namespace:EncryptionManager.Views.Helpers"
 		xmlns:vm="clr-namespace:EncryptionManager.Interfaces"
 		d:DataContext="{d:DesignInstance Type=vm:ILoginViewModel}"
         mc:Ignorable="d"
@@ -59,7 +60,9 @@
 					 Grid.Row="1"
 					 Grid.Column="1"
 					 Grid.ColumnSpan="3"
-					 TabIndex="1" />
+					 TabIndex="1"
+					 helpers:PasswordBoxHelper.BindPassword="True"
+					 helpers:PasswordBoxHelper.BoundPassword="{Binding User.Password, Mode=TwoWay}"/>
 
 		<TextBlock x:Name="TbStatus"
 				   Grid.Row="2"
