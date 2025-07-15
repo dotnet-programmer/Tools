@@ -30,7 +30,7 @@ public partial class App : Application
 	private void ShowLoginWindow()
 	{
 		var loginWindow = _serviceProvider!.GetRequiredService<LoginView>();
-		//loginWindow.LoginSucceeded += OnLoginSucceeded;
+		loginWindow.LoginSucceeded += OnLoginSucceeded;
 		loginWindow.Show();
 	}
 
