@@ -2,5 +2,5 @@
 
 public interface ILoginViewModel
 {
-
+	event EventHandler? LoginSuccessful;
 }

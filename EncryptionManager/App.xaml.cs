@@ -11,12 +11,11 @@ public partial class App : Application
 
 	protected override void OnStartup(StartupEventArgs e)
 	{
+		base.OnStartup(e);
 		ServiceCollection serviceCollection = new();
 		serviceCollection.ConfigureServices();
 		_serviceProvider = serviceCollection.BuildServiceProvider();
-		var mainView = _serviceProvider.GetRequiredService<MainView>();
-		mainView.Show();
-		base.OnStartup(e);
+		ShowLoginWindow();
 	}
 
 	protected override void OnExit(ExitEventArgs e)
@@ -26,5 +25,24 @@ public partial class App : Application
 			disposable.Dispose();
 		}
 		base.OnExit(e);
+	}
+
+	private void ShowLoginWindow()
+	{
+		var loginWindow = _serviceProvider!.GetRequiredService<LoginView>();
+		//loginWindow.LoginSucceeded += OnLoginSucceeded;
+		loginWindow.Show();
+	}
+
+	private void OnLoginSucceeded(object? sender, EventArgs e)
+	{
+		var mainWindow = _serviceProvider!.GetRequiredService<MainView>();
+		Current.MainWindow = mainWindow;
+		mainWindow.Show();
+
+		if (sender is Window loginWindow)
+		{
+			loginWindow.Close();
+		}
 	}
 }
