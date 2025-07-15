@@ -21,7 +21,7 @@
 			   BasedOn="{StaticResource BtnLoginViewStyle}">
 		</Style>
 	</Window.Resources>
-	
+
 	<Grid x:Name="GridMain"
 		  FocusManager.FocusedElement="{Binding ElementName=TbLogin}">
 
@@ -49,7 +49,7 @@
 				 Grid.Column="1"
 				 Grid.ColumnSpan="3"
 				 TabIndex="0"
-				 Text="{Binding User.Name}" />
+				 Text="{Binding User.Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True}" />
 
 		<Label x:Name="LbPassword"
 			   Grid.Row="1"
@@ -62,7 +62,7 @@
 					 Grid.ColumnSpan="3"
 					 TabIndex="1"
 					 helpers:PasswordBoxHelper.BindPassword="True"
-					 helpers:PasswordBoxHelper.BoundPassword="{Binding User.Password, Mode=TwoWay}"/>
+					 helpers:PasswordBoxHelper.BoundPassword="{Binding User.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True}"/>
 
 		<TextBlock x:Name="TbStatus"
 				   Grid.Row="2"
