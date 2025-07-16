@@ -6,17 +6,15 @@ namespace EncryptionManager.Services;
 
 internal class DialogService(IServiceProvider serviceProvider) : IDialogService
 {
-	public void Show<T>(Window? owner = null) where T : Window
+	public void Show<T>() where T : Window
 	{
 		T dialog = serviceProvider.GetRequiredService<T>();
-		dialog.Owner = owner ?? Application.Current.MainWindow;
 		dialog.Show();
 	}
 
-	public async Task ShowAsync<T>(Window? owner = null) where T : Window
+	public async Task ShowAsync<T>() where T : Window
 	{
 		T window = serviceProvider.GetRequiredService<T>();
-		window.Owner = owner ?? Application.Current.MainWindow;
 		await window.Dispatcher.InvokeAsync(() => window.Show());
 	}
 
