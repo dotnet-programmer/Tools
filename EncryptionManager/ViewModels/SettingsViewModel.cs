@@ -7,9 +7,9 @@ using EncryptionManager.Views;
 
 namespace EncryptionManager.ViewModels;
 
-internal class SettingsViewModel(IDialogService dialogService) : BaseViewModel, ISettingsViewModel
+internal class SettingsViewModel(IDialogService dialogService, IEncryptionService encryptionService) : BaseViewModel, ISettingsViewModel
 {
-	private UserSettings _settings = new();
+	private UserSettings _settings = new(encryptionService);
 	public UserSettings Settings
 	{
 		get => _settings;

@@ -1,26 +1,32 @@
 ﻿using System.ComponentModel;
 using System.Configuration;
 using System.Text;
+using EncryptionManager.Interfaces;
 
 namespace EncryptionManager.Models;
 
 public class UserSettings : IDataErrorInfo
 {
+	private const string NotEncryptedPrefix = "encrypt:";
+	
+	private readonly IEncryptionService _encryptionService;
+
 	private bool _isServerAddressValid;
 	private bool _isServerNameValid;
 	private bool _isDatabaseValid;
 	private bool _isUserValid;
 	private bool _isPasswordValid;
 
-	public UserSettings()
+	public UserSettings(IEncryptionService encryptionService)
 	{
+		_encryptionService = encryptionService;
 		try
 		{
 			ServerAddress = GetStringFromConfig(nameof(ServerAddress));
 			ServerName = GetStringFromConfig(nameof(ServerName));
 			Database = GetStringFromConfig(nameof(Database));
 			User = GetStringFromConfig(nameof(User));
-			Password = GetStringFromConfig(nameof(Password));
+			Password = GetEncryptedStringFromConfig(nameof(Password));
 		}
 		catch (ConfigurationErrorsException ex)
 		{
@@ -28,16 +34,16 @@ public class UserSettings : IDataErrorInfo
 		}
 	}
 
-	public string ServerAddress { get; set; }
-	public string ServerName { get; set; }
-	public string Database { get; set; }
-	public string User { get; set; }
-	public string Password { get; set; }
+	public string? ServerAddress { get; set; }
+	public string? ServerName { get; set; }
+	public string? Database { get; set; }
+	public string? User { get; set; }
+	public string? Password { get; set; }
 
 	public bool IsValid
 		=> _isServerAddressValid && _isServerNameValid && _isDatabaseValid && _isUserValid && _isPasswordValid;
 
-	public string Error { get; set; }
+	public string Error { get; set; } = default!;
 
 	public string this[string columnName]
 	{
@@ -78,7 +84,10 @@ public class UserSettings : IDataErrorInfo
 		settings[nameof(ServerName)].Value = ServerName;
 		settings[nameof(Database)].Value = Database;
 		settings[nameof(User)].Value = User;
-		settings[nameof(Password)].Value = Password;
+		if (!string.IsNullOrWhiteSpace(Password))
+		{
+			settings[nameof(Password)].Value = _encryptionService.Encrypt(Password);
+		}
 		configFile.Save();
 		ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
 	}
@@ -98,5 +107,23 @@ public class UserSettings : IDataErrorInfo
 		=> isValid ? string.Empty : $"Pole {fieldName} jest wymagane.";
 
 	private static string GetStringFromConfig(string key)
-		=> ConfigurationManager.AppSettings[key] ?? "Not Found";
+		=> ConfigurationManager.AppSettings[key] ?? string.Empty;
+
+	private string GetEncryptedStringFromConfig(string key)
+	{
+		string value = ConfigurationManager.AppSettings[key] ?? string.Empty;
+		if (!string.IsNullOrWhiteSpace(value))
+		{
+			if (value.StartsWith(NotEncryptedPrefix))
+			{
+				value = _encryptionService.Encrypt(value.Replace(NotEncryptedPrefix, string.Empty));
+				var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+				configFile.AppSettings.Settings[nameof(Password)].Value = value;
+				configFile.Save();
+				ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+			}
+			return _encryptionService.Decrypt(value);
+		}
+		return value;
+	}
 }
