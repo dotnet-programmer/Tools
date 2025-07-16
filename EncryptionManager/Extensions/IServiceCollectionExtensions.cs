@@ -34,13 +34,12 @@ internal static class IServiceCollectionExtensions
 		services.AddSingleton<IEncryptionService>(encryptionService);
 
 		// Configure Entity Framework Core and DbContext
-		services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
-		var connectionString = "connection string"; // TODO: read from configuration and decrypt encrypted string
-													//var connectionString = encryptionService.Decrypt(configuration.GetConnectionString("DefaultConnection"));
-		services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+		services.AddTransient<IApplicationDbContext, ApplicationDbContext>();
+		//services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(new UserSettings().GetConnectionString()));
+		services.AddDbContext<ApplicationDbContext>();
 
-		services.AddScoped<IUnitOfWork, UnitOfWork>();
-		services.AddScoped<IDbRepository, DbRepository>();
+		services.AddTransient<IUnitOfWork, UnitOfWork>();
+		services.AddTransient<IDbRepository, DbRepository>();
 
 		// Register ViewModels
 		services.AddTransient<IMainViewModel, MainViewModel>();

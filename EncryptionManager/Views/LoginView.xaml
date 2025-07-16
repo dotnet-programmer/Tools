@@ -84,7 +84,8 @@
 				Grid.Row="2"
 				Grid.Column="2"
 				TabIndex="4"
-				Command="{Binding ShowSettingsCommand}">
+				Command="{Binding ShowSettingsCommand}"
+				CommandParameter="{Binding ElementName=LoginWindow}">
 
 			<Button.Content>
 				<Image Source="/Images/Setting.png" />
@@ -143,7 +144,8 @@
 				Grid.ColumnSpan="2"
 				TabIndex="2"
 				IsDefault="True"
-				Command="{Binding LoginCommand}">
+				Command="{Binding LoginCommand}"
+				CommandParameter="{Binding ElementName=LoginWindow}">
 
 			<Button.Content>
 				<StackPanel Orientation="Horizontal">

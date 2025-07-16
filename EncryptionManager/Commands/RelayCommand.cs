@@ -13,12 +13,6 @@ internal class RelayCommand(Action<object?> execute, Predicate<object?>? canExec
 	{
 	}
 
-	public RelayCommand(Action<object?> execute, Func<bool>? canExecute = null) : this(
-		execute,
-		canExecute != null ? _ => canExecute() : null)
-	{
-	}
-
 	public event EventHandler? CanExecuteChanged
 	{
 		add => CommandManager.RequerySuggested += value;

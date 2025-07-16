@@ -7,11 +7,11 @@ namespace EncryptionManager.Interfaces;
 public interface ILoginViewModel
 {
 	UserDto User { get; set; }
-	ConnectionStatus? Status { get; set; }
+	ConnectionStatus Status { get; set; }
 	bool IsCheckConnectionEnabled { get; set; }
 	ICommand CheckConnectionCommand { get; }
 	ICommand ShowSettingsCommand { get; }
 	ICommand LoginCommand { get; }
 	ICommand CloseAppCommand { get; }
-	event EventHandler? LoginSuccessful;
+	//event EventHandler? LoginSuccessful;
 }

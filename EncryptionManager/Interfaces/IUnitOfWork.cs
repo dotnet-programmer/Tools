@@ -3,5 +3,7 @@
 internal interface IUnitOfWork
 {
 	IDbRepository DbRepository { get; }
-	void Complete();
+
+	int Complete();
+	Task<int> CompleteAsync();
 }

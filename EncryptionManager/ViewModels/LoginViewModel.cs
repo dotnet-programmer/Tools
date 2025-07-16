@@ -18,12 +18,12 @@ internal class LoginViewModel : BaseViewModel, ILoginViewModel
 	private static readonly ConnectionStatus _disconnected = new() { StatusText = "Błąd połączenia!", IsValidConnection = false };
 	private readonly System.Timers.Timer _checkConnectionTimer = new(5000);
 	private readonly ILogger<LoginViewModel> _logger;
+	private readonly IUnitOfWork _unitOfWork;
+	private readonly IDialogService _dialogService;
 
 	private UserDto _user = new();
-	private ConnectionStatus? _status;
+	private ConnectionStatus _status = new();
 	private bool _isCheckConnectionEnabled = true;
-	private IUnitOfWork _unitOfWork;
-	private readonly IDialogService _dialogService;
 
 	public LoginViewModel(ILogger<LoginViewModel> logger, IUnitOfWork unitOfWork, IDialogService dialogService)
 	{
@@ -40,7 +40,7 @@ internal class LoginViewModel : BaseViewModel, ILoginViewModel
 		set { _user = value; OnPropertyChanged(); }
 	}
 
-	public ConnectionStatus? Status
+	public ConnectionStatus Status
 	{
 		get => _status;
 		set { _status = value; OnPropertyChanged(); }
@@ -57,16 +57,7 @@ internal class LoginViewModel : BaseViewModel, ILoginViewModel
 	public ICommand LoginCommand => new RelayCommand(Login, CanLogin);
 	public ICommand CloseAppCommand => new RelayCommand(CloseApp);
 
-	public event EventHandler? LoginSuccessful;
-
-	private void ShowSettings()
-	{
-		bool? result = _dialogService.ShowDialog<SettingsView>();
-		if (result.HasValue && result.Value)
-		{
-			SetConnectionStatus();
-		}
-	}
+	//public event EventHandler? LoginSuccessful;
 
 	private void CheckConnection()
 	{
@@ -75,24 +66,31 @@ internal class LoginViewModel : BaseViewModel, ILoginViewModel
 		SetConnectionStatus();
 		if (!Status.IsValidConnection)
 		{
-			_logger.LogInformation($"{Status.StatusText} - user: {User.Name}, użytkownik: {_windowsUserName}");
+			_logger.LogInformation("{Status.StatusText} - user: {User.Name}, użytkownik: {_windowsUserName}", Status.StatusText, User.Name, _windowsUserName);
 		}
 	}
 
-	private void Login()
+	private void ShowSettings(object? commandParameter)
+	{
+		_dialogService.Show<SettingsView>();
+		CloseWindow(commandParameter);
+	}
+
+	private void Login(object? commandParameter)
 	{
 		if (_unitOfWork.DbRepository.LoginToApplication(User))
 		{
-			LoginSuccessful?.Invoke(this, EventArgs.Empty);
+			CloseWindow(commandParameter);
+			Application.Current.MainWindow.Visibility = Visibility.Visible;
 		}
 		else
 		{
-			_logger.LogInformation($"Błąd logowania - user: {User.Name}, użytkownik: {_windowsUserName}");
+			_logger.LogInformation("Błąd logowania - user: {User.Name}, użytkownik: {_windowsUserName}", User.Name, _windowsUserName);
 			MessageBox.Show("Podałeś złe dane do logowania!", "Błąd logowania!", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 	}
 
-	private bool CanLogin()
+	private bool CanLogin(object? commandParameter)
 		=> !User.HasErrors && Status.IsValidConnection;
 
 	private void CloseApp()
@@ -105,5 +103,13 @@ internal class LoginViewModel : BaseViewModel, ILoginViewModel
 	{
 		IsCheckConnectionEnabled = true;
 		_checkConnectionTimer.Stop();
+	}
+
+	private void CloseWindow(object? commandParameter)
+	{
+		if (commandParameter is Window window)
+		{
+			window.Close();
+		}
 	}
 }

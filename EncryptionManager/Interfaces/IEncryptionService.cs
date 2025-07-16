@@ -1,6 +1,6 @@
 ﻿namespace EncryptionManager.Interfaces;
 
-public interface IEncryptionService
+internal interface IEncryptionService
 {
 	string Encrypt(string input);
 	string Decrypt(string cipherText);

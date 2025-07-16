@@ -6,6 +6,9 @@ internal class UnitOfWork(IApplicationDbContext context, IDbRepository dbReposit
 {
 	public IDbRepository DbRepository => dbRepository;
 
-	public void Complete() 
+	public int Complete() 
 		=> context.SaveChanges();
+
+	public async Task<int> CompleteAsync()
+		=> await context.SaveChangesAsync();
 }

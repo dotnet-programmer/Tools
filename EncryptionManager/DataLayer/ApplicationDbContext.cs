@@ -1,14 +1,25 @@
 ﻿using System.Reflection;
 using EncryptionManager.DataLayer.Extensions;
 using EncryptionManager.Interfaces;
+using EncryptionManager.Models;
 using EncryptionManager.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace EncryptionManager.DataLayer;
 
-internal class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IApplicationDbContext
+internal class ApplicationDbContext : DbContext, IApplicationDbContext
 {
 	public DbSet<User> Users { get; set; }
+
+	//public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+	//{
+	//}
+
+	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+	{
+		optionsBuilder.UseSqlServer(new UserSettings().GetConnectionString());
+		base.OnConfiguring(optionsBuilder);
+	}
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
