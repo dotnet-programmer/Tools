@@ -3,7 +3,7 @@ using EncryptionManager.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace EncryptionManager.DataLayer.Repositories;
-internal class DbRepository(IApplicationDbContext context) : IDbRepository
+internal class DbRepository(IApplicationDbContext context, IEncryptionService encryptionService) : IDbRepository
 {
 	public bool IsValidConnectionToDataBase()
 	{
@@ -24,7 +24,7 @@ internal class DbRepository(IApplicationDbContext context) : IDbRepository
 		try
 		{
 			var user = context.Users.First(x => x.Name == userDto.Name);
-			return user.Password == userDto.Password;
+			return encryptionService.Decrypt(user.Password!) == userDto.Password;
 		}
 		catch (Exception)
 		{
