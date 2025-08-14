@@ -59,7 +59,7 @@ internal class Clock(int minutes)
 						Console.ForegroundColor = ConsoleColor.Red;
 					}
 				}
-				
+
 				digit = time[j] != ':' ? time[j] - 48 : 10;
 				Console.Write(_digits[i, digit] + " ");
 			}

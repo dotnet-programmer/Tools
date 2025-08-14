@@ -10,6 +10,7 @@
 		Height="484"
 		Width="1142"
 		KeyDown="Window_KeyDown">
+
 	<Grid>
 		<TextBox x:Name="BaseNumber"
 				 HorizontalAlignment="Left"

@@ -3,17 +3,14 @@ using System.Windows.Input;
 
 namespace ConverterStepByStep;
 
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
 public partial class MainWindow : Window
 {
 	private readonly bool _catchErrors = true;
 
-	public MainWindow() 
+	public MainWindow()
 		=> InitializeComponent();
 
-	private void OnBtnConvertClick(object sender, RoutedEventArgs e) 
+	private void OnBtnConvertClick(object sender, RoutedEventArgs e)
 		=> ConvertNumber();
 
 	private void Window_KeyDown(object sender, KeyEventArgs e)
