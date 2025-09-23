@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShutdownPC", "ShutdownPc\Sh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EncryptionManager", "EncryptionManager\EncryptionManager.csproj", "{3BD3D5E3-3D4D-48E4-BEC1-FF0AA35804A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileNameChange", "FileNameChange\FileNameChange.csproj", "{5374CD58-738B-4BDB-813F-613FAF38549B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{3BD3D5E3-3D4D-48E4-BEC1-FF0AA35804A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BD3D5E3-3D4D-48E4-BEC1-FF0AA35804A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BD3D5E3-3D4D-48E4-BEC1-FF0AA35804A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5374CD58-738B-4BDB-813F-613FAF38549B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5374CD58-738B-4BDB-813F-613FAF38549B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5374CD58-738B-4BDB-813F-613FAF38549B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5374CD58-738B-4BDB-813F-613FAF38549B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
