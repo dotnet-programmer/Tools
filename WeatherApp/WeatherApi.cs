@@ -19,38 +19,47 @@ internal class WeatherApi
 
 	public static async Task<IReadOnlyList<WeatherJson>> GetWeatherAsync(params string[] cities)
 	{
-		List<WeatherJson> results = [];
+		var tasks = cities
+            .Where(c => !string.IsNullOrWhiteSpace(c))
+            .Select(c => FetchWeatherAsync(c))
+            .ToArray();
 
-		foreach (var city in cities.Where(c => !string.IsNullOrWhiteSpace(c)))
+		var results = await Task.WhenAll(tasks);
+
+		// remove null values from the results
+		return results
+			.Where(r => r is not null)
+			.Cast<WeatherJson>()
+			.ToList();
+	}
+
+	private static async Task<WeatherJson?> FetchWeatherAsync(string city, CancellationToken cancellationToken = default)
+	{
+		try
 		{
-			try
+			string json = await GetWeatherJsonAsync(BuildWeatherUri(city), cancellationToken);
+
+			if (string.IsNullOrWhiteSpace(json))
 			{
-				Uri uri = BuildWeatherUri(city);
-				string json = await GetWeatherJsonAsync(uri);
-
-				if (string.IsNullOrWhiteSpace(json))
-				{
-					Console.WriteLine($"Brak danych dla miasta: {city}");
-					continue;
-				}
-
-				var weather = JsonSerializer.Deserialize<WeatherJson>(json);
-
-				if (weather is null || weather.cod != 200)
-				{
-					Console.WriteLine($"Błąd API dla miasta: {city}");
-					continue;
-				}
-
-				results.Add(weather);
+				Console.WriteLine($"Brak danych dla miasta: {city}");
+				return null;
 			}
-			catch (Exception ex)
+
+			var weather = JsonSerializer.Deserialize<WeatherJson>(json);
+
+			if (weather is null || weather.cod != 200)
 			{
-				Console.WriteLine($"Błąd przy pobieraniu pogody dla miasta '{city}': {ex.Message}");
+				Console.WriteLine($"Błąd API dla miasta: {city}");
+				return null;
 			}
+
+			return weather;
 		}
-
-		return results;
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Błąd przy pobieraniu pogody dla miasta '{city}': {ex.Message}");
+			return null;
+		}
 	}
 
 	private static Uri BuildWeatherUri(string city)
@@ -114,16 +123,16 @@ internal class WeatherApi
  * HttpClient tworzony w metodzie, może powodować wyczerpanie gniazd TCP  ->  Statyczny HttpClient
  * Klucz API zaszyty w kodzie  ->  Klucz API w pliku konfiguracji
  * Brak możliwości zmiany parametrów połączenia (jednostki, język)  ->  dodatkowe opcje w pliku konfiguracji
- * Brak sprawdzenia czy klucz API istnieje  ->  wprawdzenie czy jest null
+ * Brak sprawdzenia czy klucz API istnieje  ->  sprawdzenie czy jest null
  * Ręczne sklejanie adresu ze stringów  ->  użycie UriBuilder, dzięki temu gwarancja poprawnego kodowania parametrów i poprawnego formatowania adresu
  * Brak walidacji miast, pusty string generuje błędne zapytanie  ->  Pobieranie poprawnej listy miast 
- * Break w foreach przy błędzie przerywa całą pętlę, zamiast tylko pominąć błędne miasto  ->  użycie continue
  * JsonSerializer.Deserialize<WeatherJson> może zwrócić null. Brak sprawdzenia, możliwy NullReferenceException  ->  walidacja null dla json
  * throw new Exception(response.RequestMessage.ToString()) generuje ogólny wyjątek, trudny do diagnozy  ->  Obsługa wyjątków z bardziej precyzyjnymi typami (HttpRequestException, TaskCanceledException).
  * Brak obsługi anulowania (CancellationToken), przy dłuższych requestach użytkownik nie może przerwać  ->  CancellationToken obsłużony w GetWeatherJsonAsync.
- * Nazwy miast mogą zawierać błędne znaki dla url  ->  Uri.EscapeDataString() zabezpiecza nazwy miast.
  * 
  * Zmiana typu zwracanego z List<WeatherJson> na IReadOnlyList<WeatherJson> czyli kolekcja elementów tylko do odczytu, do których można uzyskać dostęp za pomocą indeksu.
  * Dodanie bloku using do wywołania _httpClient.GetAsync() dla HttpResponseMessage
+ * 
+ * Zmiana pojedynczego pobierania danych w pętli foreach na równoległe pobranie danych dla wszystkich miast poprzez Task.WhenAll()
  * 
  */
