@@ -1,11 +1,9 @@
 ﻿using WeatherApp;
 
 ConsoleColor defaultColor = Console.ForegroundColor;
-int defaultHeight = Console.WindowHeight;
+const string celsiusSign = "°C"; // \x00B0
 
-var weatherList = await WeatherApi.GetWeather("Gdańsk", "Kielce");
-
-Console.WindowHeight = defaultHeight + 10;
+var weatherList = await WeatherApi.GetWeatherAsync("Gdańsk", "Kielce");
 
 foreach (var weather in weatherList)
 {
@@ -15,13 +13,13 @@ foreach (var weather in weatherList)
 
 	Console.WriteLine("Aktualna Odczuwalna   Max     Min");
 	Console.ForegroundColor = ConsoleColor.Green;
-	Console.Write($" {weather.main.temp:f2}\x00B0C    ");
+	Console.Write($" {weather.main.temp:f2}{celsiusSign}    ");
 	Console.ForegroundColor = ConsoleColor.Yellow;
-	Console.Write($"{weather.main.feels_like:f2}\x00B0C   ");
+	Console.Write($"{weather.main.feels_like:f2}{celsiusSign}   ");
 	Console.ForegroundColor = ConsoleColor.Red;
-	Console.Write($"{weather.main.temp_max:f2}\x00B0C  ");
+	Console.Write($"{weather.main.temp_max:f2}{celsiusSign}  ");
 	Console.ForegroundColor = ConsoleColor.Blue;
-	Console.WriteLine($"{weather.main.temp_min:f2}\x00B0C");
+	Console.WriteLine($"{weather.main.temp_min:f2}{celsiusSign}");
 	Console.ForegroundColor = defaultColor;
 
 	Console.WriteLine($"\nPogoda: {weather.weather[0].main} - {weather.weather[0].description}");

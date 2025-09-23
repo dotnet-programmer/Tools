@@ -4,52 +4,114 @@ namespace WeatherApp;
 
 internal class WeatherApi
 {
-	//private const string _apiAddressId = "https://api.openweathermap.org/data/2.5/weather?id=";
-	private const string _apiAddressCity = "https://api.openweathermap.org/data/2.5/weather?q=";
+	// base url for UriBuilder
+	private const string BaseUrl = "https://api.openweathermap.org/data/2.5/weather";
 
-	private const string _apiKey = "&appid=";
-	private const string _parameters = "&units=metric&lang=pl";
+	// get the key from the environment variable (or configuration)
+	private static readonly string? _apiKey = Environment.GetEnvironmentVariable("OPENWEATHER_API_KEY");
 
-	public static async Task<List<WeatherJson>> GetWeather(params string[] cities)
+	// one instance of HttpClient for the entire application lifecycle, to prevent port exhaustion problems
+	private static readonly HttpClient _httpClient = new();
+
+	public static async Task<IReadOnlyList<WeatherJson>> GetWeatherAsync(params string[] cities)
 	{
-		List<WeatherJson> result = new(cities.Length);
-
-		foreach (var item in cities)
+		if (string.IsNullOrWhiteSpace(_apiKey))
 		{
-			var weather = JsonSerializer.Deserialize<WeatherJson>(await GetWeatherJsonAsync($"{_apiAddressCity}{item}{_apiKey}{_parameters}"));
-
-			if (weather.cod != 200)
-			{
-				Console.WriteLine($"Błąd dla miejscowości: {item}");
-				break;
-			}
-
-			result.Add(weather);
+			throw new InvalidOperationException("API key missing from OPENWEATHER_API_KEY environment variable");
 		}
 
-		return result;
+		List<WeatherJson> results = [];
+
+		foreach (var city in cities.Where(c => !string.IsNullOrWhiteSpace(c)))
+		{
+			try
+			{
+				Uri uri = BuildWeatherUri(city);
+				string json = await GetWeatherJsonAsync(uri);
+
+				if (string.IsNullOrWhiteSpace(json))
+				{
+					Console.WriteLine($"Brak danych dla miasta: {city}");
+					continue;
+				}
+
+				var weather = JsonSerializer.Deserialize<WeatherJson>(json);
+
+				if (weather is null || weather.cod != 200)
+				{
+					Console.WriteLine($"Błąd API dla miasta: {city}");
+					continue;
+				}
+
+				results.Add(weather);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Błąd przy pobieraniu pogody dla miasta '{city}': {ex.Message}");
+			}
+		}
+
+		return results;
 	}
 
-	private static async Task<string> GetWeatherJsonAsync(string url)
+	private static Uri BuildWeatherUri(string city)
 	{
-		string json = string.Empty;
+		UriBuilder builder = new(BaseUrl);
+		var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
+		query["q"] = city;
+		query["appid"] = _apiKey;
+		query["units"] = "metric";
+		query["lang"] = "pl";
+		builder.Query = query.ToString();
+		return builder.Uri;
+	}
+
+	private static async Task<string> GetWeatherJsonAsync(Uri uri, CancellationToken cancellationToken = default)
+	{
 		try
 		{
-			HttpClient httpClient = new();
-			var response = await httpClient.GetAsync(url);
+			// using block because HttpResponseMessage implements IDisposable
+			using var response = await _httpClient.GetAsync(uri, cancellationToken);
 
-			if (!response.IsSuccessStatusCode)
-			{
-				throw new Exception(response.RequestMessage.ToString());
-			}
+			// check if the response is successful (status code 2xx)
+			response.EnsureSuccessStatusCode();
 
-			json = await response.Content.ReadAsStringAsync();
+			// read the contents of the response as a string
+			return await response.Content.ReadAsStringAsync(cancellationToken);
+		}
+		catch (HttpRequestException ex)
+		{
+			Console.WriteLine($"Błąd HTTP: {ex.Message}");
+		}
+		catch (TaskCanceledException)
+		{
+			Console.WriteLine("Żądanie zostało anulowane");
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine($"Http.Get method error: {ex.Message}");
+			Console.WriteLine($"Nieoczekiwany błąd: {ex.Message}");
 		}
 
-		return json;
+		return string.Empty;
 	}
 }
+
+
+/*
+ * problem  ->  rozwiązanie
+ * 
+ * HttpClient tworzony w metodzie, może powodować wyczerpanie gniazd TCP  ->  Statyczny HttpClient
+ * Klucz API zaszyty w kodzie  ->  Klucz API brany ze zmiennej środowiskowej OPENWEATHER_API_KEY.
+ * Brak sprawdzenia czy klucz API istnieje  ->  wprawdzenie czy jest null
+ * Ręczne sklejanie adresu ze stringów  ->  użycie UriBuilder, dzięki temu gwarancja poprawnego kodowania parametrów i poprawnego formatowania adresu
+ * Brak walidacji miast, pusty string generuje błędne zapytanie  ->  Pobieranie poprawnej listy miast 
+ * Break w foreach przy błędzie przerywa całą pętlę, zamiast tylko pominąć błędne miasto  ->  użycie continue
+ * JsonSerializer.Deserialize<WeatherJson> może zwrócić null. Brak sprawdzenia, możliwy NullReferenceException  ->  walidacja null dla json
+ * throw new Exception(response.RequestMessage.ToString()) generuje ogólny wyjątek, trudny do diagnozy  ->  Obsługa wyjątków z bardziej precyzyjnymi typami (HttpRequestException, TaskCanceledException).
+ * Brak obsługi anulowania (CancellationToken), przy dłuższych requestach użytkownik nie może przerwać  ->  CancellationToken obsłużony w GetWeatherJsonAsync.
+ * Nazwy miast mogą zawierać błędne znaki dla url  ->  Uri.EscapeDataString() zabezpiecza nazwy miast.
+ * 
+ * Zmiana typu zwracanego z List<WeatherJson> na IReadOnlyList<WeatherJson> czyli kolekcja elementów tylko do odczytu, do których można uzyskać dostęp za pomocą indeksu.
+ * Dodanie bloku using do wywołania _httpClient.GetAsync() dla HttpResponseMessage
+ * 
+ */
