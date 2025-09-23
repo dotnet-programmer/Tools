@@ -8,6 +8,8 @@ internal class WeatherApi
 	// base url for UriBuilder
 	private const string BaseUrl = "https://api.openweathermap.org/data/2.5/weather";
 
+	private const int MaxRequestCount = 5;
+
 	// one instance of HttpClient for the entire application lifecycle, to prevent port exhaustion problems
 	private static readonly HttpClient _httpClient = new();
 
@@ -16,6 +18,9 @@ internal class WeatherApi
 		.SetBasePath(AppContext.BaseDirectory)
 		.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
 		.Build();
+
+	// limit of concurrent requests
+	private static readonly SemaphoreSlim _semaphore = new(MaxRequestCount);
 
 	public static async Task<IReadOnlyList<WeatherJson>> GetWeatherAsync(params string[] cities)
 	{
@@ -35,6 +40,9 @@ internal class WeatherApi
 
 	private static async Task<WeatherJson?> FetchWeatherAsync(string city, CancellationToken cancellationToken = default)
 	{
+		// entry into the limited section
+		await _semaphore.WaitAsync(cancellationToken);
+
 		try
 		{
 			string json = await GetWeatherJsonAsync(BuildWeatherUri(city), cancellationToken);
@@ -59,6 +67,11 @@ internal class WeatherApi
 		{
 			Console.WriteLine($"Błąd przy pobieraniu pogody dla miasta '{city}': {ex.Message}");
 			return null;
+		}
+		finally
+		{
+			// release semaphore
+			_semaphore.Release();
 		}
 	}
 
@@ -134,5 +147,6 @@ internal class WeatherApi
  * Dodanie bloku using do wywołania _httpClient.GetAsync() dla HttpResponseMessage
  * 
  * Zmiana pojedynczego pobierania danych w pętli foreach na równoległe pobranie danych dla wszystkich miast poprzez Task.WhenAll()
+ * Dodanie limitu jednoczesnych połączeń - SemaphoreSlim
  * 
  */
