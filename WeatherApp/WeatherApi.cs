@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace WeatherApp;
 
@@ -7,19 +8,17 @@ internal class WeatherApi
 	// base url for UriBuilder
 	private const string BaseUrl = "https://api.openweathermap.org/data/2.5/weather";
 
-	// get the key from the environment variable (or configuration)
-	private static readonly string? _apiKey = Environment.GetEnvironmentVariable("OPENWEATHER_API_KEY");
-
 	// one instance of HttpClient for the entire application lifecycle, to prevent port exhaustion problems
 	private static readonly HttpClient _httpClient = new();
 
+	// configuration with connection parameters
+	private static readonly IConfigurationRoot _configuration = new ConfigurationBuilder()
+		.SetBasePath(AppContext.BaseDirectory)
+		.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+		.Build();
+
 	public static async Task<IReadOnlyList<WeatherJson>> GetWeatherAsync(params string[] cities)
 	{
-		if (string.IsNullOrWhiteSpace(_apiKey))
-		{
-			throw new InvalidOperationException("API key missing from OPENWEATHER_API_KEY environment variable");
-		}
-
 		List<WeatherJson> results = [];
 
 		foreach (var city in cities.Where(c => !string.IsNullOrWhiteSpace(c)))
@@ -59,11 +58,23 @@ internal class WeatherApi
 		UriBuilder builder = new(BaseUrl);
 		var query = System.Web.HttpUtility.ParseQueryString(string.Empty);
 		query["q"] = city;
-		query["appid"] = _apiKey;
-		query["units"] = "metric";
-		query["lang"] = "pl";
+		query["appid"] = GetValueFromConfiguration("ApiKey");
+		query["units"] = GetValueFromConfiguration("Units");
+		query["lang"] = GetValueFromConfiguration("Lang");
 		builder.Query = query.ToString();
 		return builder.Uri;
+	}
+
+	private static string GetValueFromConfiguration(string key)
+	{
+		string? value = _configuration[$"WeatherApi:{key}"];
+
+		if (string.IsNullOrWhiteSpace(value))
+		{
+			throw new InvalidOperationException($"No {key} in the configuration");
+		}
+
+		return value;
 	}
 
 	private static async Task<string> GetWeatherJsonAsync(Uri uri, CancellationToken cancellationToken = default)
@@ -101,7 +112,8 @@ internal class WeatherApi
  * problem  ->  rozwiązanie
  * 
  * HttpClient tworzony w metodzie, może powodować wyczerpanie gniazd TCP  ->  Statyczny HttpClient
- * Klucz API zaszyty w kodzie  ->  Klucz API brany ze zmiennej środowiskowej OPENWEATHER_API_KEY.
+ * Klucz API zaszyty w kodzie  ->  Klucz API w pliku konfiguracji
+ * Brak możliwości zmiany parametrów połączenia (jednostki, język)  ->  dodatkowe opcje w pliku konfiguracji
  * Brak sprawdzenia czy klucz API istnieje  ->  wprawdzenie czy jest null
  * Ręczne sklejanie adresu ze stringów  ->  użycie UriBuilder, dzięki temu gwarancja poprawnego kodowania parametrów i poprawnego formatowania adresu
  * Brak walidacji miast, pusty string generuje błędne zapytanie  ->  Pobieranie poprawnej listy miast 
